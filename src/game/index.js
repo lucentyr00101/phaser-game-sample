@@ -29,7 +29,9 @@ function preload() {
   this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 })
 }
 
-let platforms, player, cursors
+let platforms, player, cursors, stars
+let score = 0
+let scoreText
 
 function create() {
   this.add.image(400, 300, 'sky')
@@ -69,6 +71,27 @@ function create() {
 
   this.physics.add.collider(player, platforms);
 
+  stars = this.physics.add.group({
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+  });
+
+  stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  });
+
+  this.physics.add.collider(stars, platforms);
+
+  this.physics.add.overlap(player, stars, collectStar, null, this);
+
+  scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+}
+
+function collectStar (player, star) {
+  star.disableBody(true, true);
+  score += 10;
+  scoreText.setText('Score: ' + score);
 }
 
 function update() {
